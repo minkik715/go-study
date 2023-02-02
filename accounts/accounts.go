@@ -36,3 +36,7 @@ func (a *Account) Withdraw(amount int) error {
 func (a *Account) ChangeOwner(owner string) {
 	a.owner = owner
 }
+
+func (a *Account) Owner() string {
+	return a.owner
+}
