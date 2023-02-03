@@ -1,19 +1,42 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"learngo/myDict"
+	"net/http"
 )
 
-func main() {
-	dictionary := myDict.Dictionary{}
-	dictionary["fuck2"] = "you"
-	result, err := dictionary.Search("fuck")
-	if result == "" {
-		fmt.Println(err)
-	}
-	dictionary.Add("first", "two")
-	dictionary.Add("first", "two")
+var errRequestFailed = errors.New("Request Failed")
 
-	fmt.Println(dictionary)
+type result struct {
+	url    string
+	status string
+}
+
+func main() {
+	c := make(chan result)
+	urls := []string{
+		"https://www.airbnb.com/",
+		"https://www.google.com/",
+		"https://www.amazon.com/",
+		"https://www.reddit.com/",
+		"https://www.google.com/",
+		"https://soundcloud.com/",
+		"https://www.facebook.com/",
+		"https://www.instagram.com/",
+		"https://academy.nomadcoders.co/",
+	}
+
+	for _, url := range urls {
+		go hitURL(url, c)
+	}
+
+	for i := 0; i < len(urls); i++ {
+		fmt.Println(<-c)
+	}
+}
+
+func hitURL(url string, c chan<- result) {
+	resp, _ := http.Get(url)
+	c <- result{url, resp.Status}
 }
