@@ -1,42 +1,35 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"log"
 	"net/http"
 )
 
-var errRequestFailed = errors.New("Request Failed")
-
-type result struct {
-	url    string
-	status string
-}
+var baseURL string = "https://kr.indeed.com/jobs?q=python&limit=50"
 
 func main() {
-	c := make(chan result)
-	urls := []string{
-		"https://www.airbnb.com/",
-		"https://www.google.com/",
-		"https://www.amazon.com/",
-		"https://www.reddit.com/",
-		"https://www.google.com/",
-		"https://soundcloud.com/",
-		"https://www.facebook.com/",
-		"https://www.instagram.com/",
-		"https://academy.nomadcoders.co/",
-	}
+	pages := getPages()
+	fmt.Println(pages)
+}
 
-	for _, url := range urls {
-		go hitURL(url, c)
-	}
+func getPages() int {
+	res, err := http.Get(baseURL)
+	checkErr(err)
+	checkResCode(res)
+	goquery.ToEnd
+	return 0
+}
 
-	for i := 0; i < len(urls); i++ {
-		fmt.Println(<-c)
+func checkErr(err error) {
+	if err != nil {
+		log.Fatalln(err)
 	}
 }
 
-func hitURL(url string, c chan<- result) {
-	resp, _ := http.Get(url)
-	c <- result{url, resp.Status}
+func checkResCode(res *http.Response) {
+	if res.StatusCode != 200 {
+		log.Fatalln("Request failed with Status:", res.StatusCode)
+	}
 }
